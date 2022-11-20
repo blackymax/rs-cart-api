@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpStatus,
 } from '@nestjs/common';
+import { headers } from '../constants';
 
 // import { BasicAuthGuard, JwtAuthGuard } from '../auth';
 import { AppRequest } from '../shared';
@@ -29,6 +30,7 @@ export class OrderController {
 
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: { items: orders },
     };
@@ -40,6 +42,7 @@ export class OrderController {
 
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: { items: orders },
     };
@@ -63,6 +66,7 @@ export class OrderController {
 
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: {
         order: createdOrder,

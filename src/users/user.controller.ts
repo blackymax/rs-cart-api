@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Req, HttpStatus } from '@nestjs/common';
 import { UsersService } from 'src/users';
+import { headers } from '../constants';
 
 // import { BasicAuthGuard, JwtAuthGuard } from '../auth';
 import { AppRequest } from '../shared';
@@ -17,6 +18,7 @@ export class UserController {
     console.log(user);
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: { user },
     };
@@ -28,6 +30,7 @@ export class UserController {
     console.log(users);
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: { users },
     };
@@ -41,6 +44,7 @@ export class UserController {
     console.log(user);
     return {
       statusCode: HttpStatus.OK,
+      headers,
       message: 'OK',
       data: { user },
     };
