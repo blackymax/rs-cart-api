@@ -1,0 +1,27 @@
+service: rs-cart-api
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: 'dev'
+  region: eu-west-1
+  profile: aws
+  environment:
+    PG_HOST: awsdb.c2cf02vn1xvw.eu-west-1.rds.amazonaws.com
+    PG_PORT: 5432
+    PG_DB_NAME: awsdb
+    PG_USERNAME: postgres
+    PG_PASSWORD: 0dwrJFVYpcjXCKBMpccN
+
+functions:
+  main:
+    handler: dist/main.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+          cors: true
+      - http:
+          method: ANY
+          path: /{ANY+}
+          cors: true

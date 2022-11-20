@@ -1,39 +1,66 @@
 import { Injectable } from '@nestjs/common';
-import { v4 } from 'uuid';
-
-import { Order } from '../models';
+import { InjectClient } from 'nest-postgres';
+import { Client } from 'pg';
 
 @Injectable()
 export class OrderService {
-  private orders: Record<string, Order> = {}
+  constructor(@InjectClient() private readonly pg: Client) {}
 
-  findById(orderId: string): Order {
-    return this.orders[ orderId ];
+  async findById(orderId: string): Promise<any> {
+    const orders = await this.pg.query(
+      `SELECT * FROM orders WHERE id=$1 LIMIT 1`,
+      [orderId],
+    );
+    return orders.rows[0];
   }
 
-  create(data: any) {
-    const id = v4(v4())
-    const order = {
-      ...data,
-      id,
-      status: 'inProgress',
-    };
-
-    this.orders[ id ] = order;
-
-    return order;
+  async getOrders(): Promise<any> {
+    const orders = await this.pg.query(`SELECT * FROM orders`);
+    return orders.rows;
   }
 
-  update(orderId, data) {
-    const order = this.findById(orderId);
+  async create(data: any) {
+    const { user_id, cart_id, payment, delievery, comments, total } = data;
 
-    if (!order) {
-      throw new Error('Order does not exist.');
-    }
+    const orders = await this.pg.query(
+      `INSERT INTO orders (user_id, cart_id, payment, delievery, comments, total, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [user_id, cart_id, payment, delievery, comments, total, 'inProgress'],
+    );
 
-    this.orders[ orderId ] = {
-      ...data,
-      id: orderId,
-    }
+    console.log('ORDERS', orders);
+
+    return orders.rows[0];
+  }
+
+  async updateById(orderId, data): Promise<any> {
+    const {
+      user_id,
+      cart_id,
+      payment,
+      delievery,
+      comments,
+      total,
+      status,
+    } = data;
+    const orders = await this.pg.query(
+      `UPDATE orders SET (user_id = $1, cart_id = $2, payment = $3, delivery = $4, comments = $5, total = $6, status = $7) WHERE id=$8 LIMIT 1`,
+      [user_id, cart_id, payment, delievery, comments, total, status, orderId],
+    );
+    return orders.rows[0];
+  }
+
+  async updateStatusAndCommentById(orderId, data): Promise<any> {
+    const { comments, status } = data;
+    const orders = await this.pg.query(
+      `UPDATE orders SET ( comments = $1, status = $2) WHERE id=$3 LIMIT 1`,
+      [comments, status, orderId],
+    );
+    return orders.rows[0];
+  }
+
+  async deleteOrder(orderId): Promise<any> {
+    await this.pg.query(`DELETE FROM orders WHERE id=$1`, [
+      orderId,
+    ]);
   }
 }
